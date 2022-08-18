@@ -1,4 +1,4 @@
-export const defaultRun = [
+export const defaultRun = () => [
   "docker",
   "run",
   "-itd",
@@ -10,4 +10,10 @@ export const defaultRun = [
   }`,
   "--mount",
   "type=volume,src=certs,dst=/usr/local/share/ca-certificates/external",
+  ...(Deno.env.get("TMP_AS_TMPFS")
+    ? [
+      "--mount",
+      "type=tmpfs,dst=/tmp",
+    ]
+    : []),
 ];

@@ -1,3 +1,5 @@
+import "./dep/dot_env_load.ts";
+
 import { defaultRun } from "./internal/default_param.ts";
 import { run } from "./internal/run.ts";
 
@@ -18,7 +20,7 @@ const trimProtocolScheme = (url?: string): string | undefined => {
 
 Deno.exit(
   await run([
-    ...defaultRun,
+    ...defaultRun(),
     // prefer v option for that
     // rancher-desktop is not currently able to handle `--mount` option for single file mount.
     "-v",
