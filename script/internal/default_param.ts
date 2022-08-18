@@ -16,4 +16,10 @@ export const defaultRun = () => [
       "type=tmpfs,dst=/tmp",
     ]
     : []),
+  ...(Deno.env.get("MOUNT_VSCODE_SERVER")
+    ? [
+      "--mount",
+      "type=volume,dst=/root/.vscode-server",
+    ]
+    : []),
 ];
