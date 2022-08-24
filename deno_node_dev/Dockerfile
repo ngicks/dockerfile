@@ -1,10 +1,8 @@
 ARG UBUNTU_TAG=jammy-20220801
-ARG GO_VERSION=1.19.0
 ARG NODE_VERSION=18.7.0
 ARG DENO_VERSION=1.24.3
 
 FROM krallin/ubuntu-tini:trusty AS tini_bin
-FROM golang:${GO_VERSION}-bullseye AS go_bin
 FROM node:${NODE_VERSION}-bullseye AS node_bin
 FROM denoland/deno:bin-${DENO_VERSION} AS deno_bin
 
@@ -20,29 +18,11 @@ RUN apt-get update && apt-get install -y ${LIBS_DEP}
 
 ARG NETBASE="ca-certificates curl netbase wget"
 ARG DEV_DEP="git less"
-ARG GO_DEP="g++ gcc libc6-dev make pkg-config"
 RUN apt-get update && apt-get install -y\
     ${NETBASE}\
-    ${DEV_DEP}\
-    ${GO_DEP}
-
-# docker cli
-RUN apt-get update && apt-get install -y\
-    ca-certificates curl gnupg lsb-release &&\
-    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg &&\
-    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"\
-    | tee /etc/apt/sources.list.d/docker.list > /dev/null &&\
-    apt-get update && apt-get install -y\
-    docker-ce docker-ce-cli containerd.io
+    ${DEV_DEP}
 
 COPY --from=tini_bin /usr/bin/tini /usr/bin/tini
-
-# Go
-COPY --from=go_bin /usr/local/go /usr/local/go
-ENV GOPATH=/go\
-    PATH=${GOPATH}/bin:$PATH
-RUN mkdir -p "$GOPATH/src" "$GOPATH/bin" && chmod -R 777 "$GOPATH"    
-VOLUME [ "/go" ]
 
 # Node.js
 COPY --from=node_bin /usr/local/include /usr/local/include

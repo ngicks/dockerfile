@@ -1,0 +1,9 @@
+{
+  "ParentImageName": "",
+  "ParentImageTag": "",
+  "UseRust": true,
+  "UseGo": false,
+  "UseNode": false,
+  "UseDeno": true,
+  "Dood": false
+}
