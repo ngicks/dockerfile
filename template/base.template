@@ -102,7 +102,7 @@ VOLUME [ "/usr/local/cargo", "/usr/local/rustup" ]
 # Go
 COPY --from=go_bin /usr/local/go /usr/local/go
 ENV GOPATH=/go\
-    PATH=${GOPATH}/bin:$PATH
+    PATH=${GOPATH}/bin:/usr/local/go/bin:$PATH
 RUN mkdir -p "$GOPATH/src" "$GOPATH/bin" && chmod -R 777 "$GOPATH"    
 VOLUME [ "/go" ]
 {{- end}}
