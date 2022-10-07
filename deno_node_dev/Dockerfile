@@ -1,6 +1,6 @@
 ARG UBUNTU_TAG=jammy-20220801
 ARG NODE_VERSION=18.7.0
-ARG DENO_VERSION=1.24.3
+ARG DENO_VERSION=1.26.1
 
 FROM krallin/ubuntu-tini:trusty AS tini_bin
 FROM node:${NODE_VERSION}-bullseye AS node_bin
