@@ -1,5 +1,6 @@
 export const run = async (cmd: string[]): Promise<number> => {
   if (Deno.env.get("DRY_RUN")) {
+    console.log(Deno.env.toObject());
     console.log(cmd);
     return 0;
   }
