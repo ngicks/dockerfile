@@ -10,16 +10,21 @@ export const defaultRun = () => [
   }`,
   "--mount",
   "type=volume,src=certs,dst=/usr/local/share/ca-certificates/external",
-  ...(Deno.env.get("TMP_AS_TMPFS")
+  ...(envIsSetAndNonZero("TMP_AS_TMPFS")
     ? [
       "--mount",
       "type=tmpfs,dst=/tmp",
     ]
     : []),
-  ...(Deno.env.get("MOUNT_VSCODE_SERVER")
+  ...(envIsSetAndNonZero("MOUNT_VSCODE_SERVER")
     ? [
       "--mount",
       "type=volume,dst=/root/.vscode-server",
     ]
     : []),
 ];
+
+const envIsSetAndNonZero = (envStr: string): boolean => {
+  const env = Deno.env.get(envStr);
+  return typeof env === "string" && env !== "" && env !== "0";
+};
