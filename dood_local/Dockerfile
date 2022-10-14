@@ -33,7 +33,7 @@ RUN apt-get update && apt-get install -y\
     echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"\
     | tee /etc/apt/sources.list.d/docker.list > /dev/null &&\
     apt-get update && apt-get install -y\
-    docker-ce docker-ce-cli containerd.io
+    docker-ce docker-ce-cli containerd.io docker-compose-plugin
 
 COPY --from=tini_bin /usr/bin/tini /usr/bin/tini
 
@@ -63,7 +63,7 @@ COPY --from=deno_bin /deno /usr/bin/deno
 # see https://deno.land/manual/getting_started/setup_your_environment#environment-variables
 ENV DENO_DIR=/deno/cache\
     DENO_INSTALL_ROOT=/deno/bin\
-    PATH=${DENO_INSTALL_ROOT}:$PATH
+    PATH=/deno/bin:$PATH
 VOLUME [ "/deno" ]
 
 ENTRYPOINT [ "/usr/bin/tini", "--", "/bin/bash" ]

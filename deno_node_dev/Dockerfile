@@ -43,7 +43,7 @@ COPY --from=deno_bin /deno /usr/bin/deno
 # see https://deno.land/manual/getting_started/setup_your_environment#environment-variables
 ENV DENO_DIR=/deno/cache\
     DENO_INSTALL_ROOT=/deno/bin\
-    PATH=${DENO_INSTALL_ROOT}:$PATH
+    PATH=/deno/bin:$PATH
 VOLUME [ "/deno" ]
 
 ENTRYPOINT [ "/usr/bin/tini", "--", "/bin/bash" ]
