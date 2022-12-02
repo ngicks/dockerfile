@@ -130,7 +130,7 @@ VOLUME [ "/root/.npm" ]
 COPY --from=deno_bin /deno /usr/bin/deno
 # see https://deno.land/manual/getting_started/setup_your_environment#environment-variables
 ENV DENO_DIR=/deno/cache\
-    DENO_INSTALL_ROOT=/deno/bin\
+    DENO_INSTALL_ROOT=/deno\
     PATH=/deno/bin:$PATH
 VOLUME [ "/deno" ]
 {{- end}}
