@@ -1,6 +1,6 @@
-ARG UBUNTU_TAG=jammy-20220801
-ARG GO_VERSION=1.19.0
-ARG DENO_VERSION=1.24.3
+ARG UBUNTU_TAG=jammy-20221101
+ARG GO_VERSION=1.19.3
+ARG DENO_VERSION=1.28.3
 
 FROM krallin/ubuntu-tini:trusty AS tini_bin
 FROM golang:${GO_VERSION}-bullseye AS go_bin
@@ -29,7 +29,7 @@ VOLUME [ "/go" ]
 COPY --from=deno_bin /deno /usr/bin/deno
 # see https://deno.land/manual/getting_started/setup_your_environment#environment-variables
 ENV DENO_DIR=/deno/cache\
-    DENO_INSTALL_ROOT=/deno/bin\
+    DENO_INSTALL_ROOT=/deno\
     PATH=/deno/bin:$PATH
 VOLUME [ "/deno" ]
 

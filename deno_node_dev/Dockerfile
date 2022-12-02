@@ -1,6 +1,6 @@
-ARG UBUNTU_TAG=jammy-20220801
-ARG NODE_VERSION=18.7.0
-ARG DENO_VERSION=1.26.1
+ARG UBUNTU_TAG=jammy-20221101
+ARG NODE_VERSION=18.12.1
+ARG DENO_VERSION=1.28.3
 
 FROM krallin/ubuntu-tini:trusty AS tini_bin
 FROM node:${NODE_VERSION}-bullseye AS node_bin
@@ -42,7 +42,7 @@ VOLUME [ "/root/.npm" ]
 COPY --from=deno_bin /deno /usr/bin/deno
 # see https://deno.land/manual/getting_started/setup_your_environment#environment-variables
 ENV DENO_DIR=/deno/cache\
-    DENO_INSTALL_ROOT=/deno/bin\
+    DENO_INSTALL_ROOT=/deno\
     PATH=/deno/bin:$PATH
 VOLUME [ "/deno" ]
 

@@ -5,6 +5,5 @@
   "UseGo": false,
   "UseNode": true,
   "UseDeno": true,
-  "DenoVersion": "1.26.1",
   "Dood": false
 }

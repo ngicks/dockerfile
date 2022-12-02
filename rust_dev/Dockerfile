@@ -1,6 +1,6 @@
-ARG UBUNTU_TAG=jammy-20220801
-ARG RUST_VERSION=1.63.0
-ARG DENO_VERSION=1.24.3
+ARG UBUNTU_TAG=jammy-20221101
+ARG RUST_VERSION=1.65.0
+ARG DENO_VERSION=1.28.3
 
 FROM krallin/ubuntu-tini:trusty AS tini_bin
 FROM rust:${RUST_VERSION}-slim-buster AS rust_bin
@@ -41,7 +41,7 @@ VOLUME [ "/usr/local/cargo", "/usr/local/rustup" ]
 COPY --from=deno_bin /deno /usr/bin/deno
 # see https://deno.land/manual/getting_started/setup_your_environment#environment-variables
 ENV DENO_DIR=/deno/cache\
-    DENO_INSTALL_ROOT=/deno/bin\
+    DENO_INSTALL_ROOT=/deno\
     PATH=/deno/bin:$PATH
 VOLUME [ "/deno" ]
 
