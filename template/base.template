@@ -1,4 +1,7 @@
-{{- if not .ParentImageName }}ARG UBUNTU_TAG={{- if not .UbuntuTag}}jammy-20220801{{- else}}{{- .UbuntuTag}}{{- end}}
+# syntax = docker/dockerfile:1.4
+
+{{- if not .ParentImageName }}
+ARG UBUNTU_TAG={{- if not .UbuntuTag}}jammy-20220801{{- else}}{{- .UbuntuTag}}{{- end}}
 {{- end}}
 
 {{- if .UseRust}}
@@ -17,7 +20,6 @@ ARG NODE_VERSION={{.NodeVersion}}
 ARG DENO_VERSION={{.DenoVersion}}
 {{- end}}
 
-FROM krallin/ubuntu-tini:trusty AS tini_bin
 {{- if .UseRust}}
 FROM rust:${RUST_VERSION}-slim-buster AS rust_bin
 {{- end}}
@@ -32,6 +34,12 @@ FROM node:${NODE_VERSION}-bullseye AS node_bin
 
 {{- if .UseDeno}}
 FROM denoland/deno:bin-${DENO_VERSION} AS deno_bin
+{{- end}}
+
+{{- if .Dood}}
+FROM docker:24.0.5 AS docker_bin
+FROM docker/compose-bin:v2.20.2 AS docker_compose_bin
+FROM docker/buildx-bin:0.11.2 AS docker_buildx_bin
 {{- end}}
 
 {{- if not .ParentImageName}}
@@ -50,10 +58,15 @@ ARG LIBS_DEP="autoconf automake bzip2 dpkg-dev file g++ gcc imagemagick libbz2-d
     libncurses5-dev libncursesw5-dev libpng-dev libpq-dev libreadline-dev libsqlite3-dev libssl-dev\
     libtool libwebp-dev libxml2-dev libxslt-dev libyaml-dev make patch unzip xz-utils zlib1g-dev\
     libmysqlclient-dev"
-RUN apt-get update && apt-get install -y ${LIBS_DEP}
+RUN --mount=type=secret,id=certs,target=/etc/ssl/certs/ca-certificates.crt \
+    --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    rm -f /etc/apt/apt.conf.d/docker-clean \
+    ; echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' > /etc/apt/apt.conf.d/keep-cache &&\
+    apt-get update && apt-get install --no-install-recommends -y ${LIBS_DEP}
 {{- end}}
 
-ARG NETBASE="ca-certificates curl netbase wget"
+ARG NETBASE="curl netbase wget"
 ARG DEV_DEP="git less"
 {{- if .UseRust}}
 ARG BINDGEN_DEP="llvm-dev libclang-dev clang"
@@ -61,7 +74,12 @@ ARG BINDGEN_DEP="llvm-dev libclang-dev clang"
 {{- if .UseGo}}
 ARG GO_DEP="g++ gcc libc6-dev make pkg-config"
 {{- end}}
-RUN apt-get update && apt-get install -y\
+RUN --mount=type=secret,id=certs,target=/etc/ssl/certs/ca-certificates.crt \
+    --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    rm -f /etc/apt/apt.conf.d/docker-clean \
+    ; echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' > /etc/apt/apt.conf.d/keep-cache &&\
+    apt-get update && apt-get install --no-install-recommends -y\
     ${NETBASE}\
     ${DEV_DEP}{{- if .UseRust}}\
     ${BINDGEN_DEP}
@@ -72,16 +90,10 @@ RUN apt-get update && apt-get install -y\
 {{- if .Dood}}
 
 # docker cli
-RUN apt-get update && apt-get install -y\
-    ca-certificates curl gnupg lsb-release &&\
-    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg &&\
-    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"\
-    | tee /etc/apt/sources.list.d/docker.list > /dev/null &&\
-    apt-get update && apt-get install -y\
-    docker-ce docker-ce-cli containerd.io docker-compose-plugin
+COPY --from=docker_bin /usr/local/bin/docker /usr/local/bin/docker
+COPY --from=docker_compose_bin /docker-compose /usr/libexec/docker/cli-plugins/docker-compose
+COPY --from=docker_buildx_bin /buildx /usr/libexec/docker/cli-plugins/docker-buildx
 {{- end}}
-
-COPY --from=tini_bin /usr/bin/tini /usr/bin/tini
 
 {{- if .UseRust}}
 
@@ -114,7 +126,6 @@ COPY --from=node_bin /usr/local/include /usr/local/include
 COPY --from=node_bin /usr/local/lib/node_modules /usr/local/lib/node_modules
 COPY --from=node_bin /usr/local/share/man /usr/local/share/man
 COPY --from=node_bin /usr/local/share/doc /usr/local/share/doc
-COPY --from=node_bin /usr/local/share/systemtap /usr/local/share/systemtap
 
 COPY --from=node_bin /usr/local/bin/node /usr/local/bin/node
 RUN ln -s /usr/local/lib/node_modules/corepack/dist/corepack.js /usr/local/bin/corepack &&\
@@ -127,6 +138,7 @@ VOLUME [ "/root/.npm" ]
 {{- if .UseDeno}}
 
 # Deno
+ENV DENO_CERT=/etc/ssl/certs/ca-certificates.crt
 COPY --from=deno_bin /deno /usr/bin/deno
 # see https://deno.land/manual/getting_started/setup_your_environment#environment-variables
 ENV DENO_DIR=/deno/cache\
@@ -140,5 +152,5 @@ VOLUME [ "/deno" ]
 ENTRYPOINT {{.EntryPoint}}
 {{else}}
 
-ENTRYPOINT [ "/usr/bin/tini", "--", "/bin/bash" ]
+ENTRYPOINT [ "/bin/bash" ]
 {{end}}

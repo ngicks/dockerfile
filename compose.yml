@@ -1,0 +1,76 @@
+name: devcontainers
+services:
+  deno_node_dev:
+    image: github.com/ngicks/dockerfile/deno_node_dev:latest
+    init: true
+    tty: true
+    env_file: ${ENVFILE:-default.env}
+    volumes:
+      - type: volume
+        source: git
+        target: /git
+      - type: volume
+        source: vscode-server
+        target: /root/.vscode-server
+      - type: bind
+        source: ${CERT_DIR:-/etc/ssl/certs/}
+        target: /etc/ssl/certs/
+        read_only: true
+      - type: volume
+        source: deno
+        target: /deno
+      - type: volume
+        source: npm
+        target: /root/.npm
+  dood_local:
+    image: github.com/ngicks/dockerfile/dood_local:latest
+    init: true
+    tty: true
+    env_file: ${ENVFILE:-default.env}
+    volumes_from:
+      - deno_node_dev
+    volumes:
+      - type: bind
+        source: ${DOCKR_HOST:-/var/run/docker.sock}
+        target: /var/run/docker.sock
+  go_dev:
+    image: github.com/ngicks/dockerfile/go_dev:latest
+    init: true
+    tty: true
+    env_file: ${ENVFILE:-default.env}
+    volumes_from:
+      - deno_node_dev
+    volumes:
+      - type: volume
+        source: go
+        target: /go
+  rust_dev:
+    image: github.com/ngicks/dockerfile/rust_dev:latest
+    init: true
+    tty: true
+    env_file: ${ENVFILE:-default.env}
+    volumes_from:
+      - deno_node_dev
+    volumes:
+      - type: volume
+        source: cargo
+        target: /usr/local/cargo
+      - type: volume
+        source: rustup
+        target: /usr/local/rustup
+
+volumes:
+  git:
+    external: true
+  vscode-server:
+    external: true
+  deno:
+    external: true
+  npm:
+    external: true
+  go:
+    external: true
+  cargo:
+    external: true
+  rustup:
+    external: true

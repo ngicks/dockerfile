@@ -1,0 +1,100 @@
+{
+  "group": {
+    "default": {
+      "targets": [
+        "rust_dev",
+        "deno_node_dev",
+        "dood_local",
+        "go_dev"
+      ]
+    }
+  },
+  "variable": {
+    "CERTS": {
+      "default": "/etc/ssl/certs/ca-certificates.crt"
+    },
+    "HTTP_PROXY": {
+      "default": ""
+    },
+    "HTTPS_PROXY": {
+      "default": ""
+    },
+    "NO_PROXY": {
+      "default": ""
+    }
+  },
+  "target": {
+    "deno_node_dev": {
+      "context": "deno_node_dev",
+      "dockerfile": "Dockerfile",
+      "tags": [
+        "github.com/ngicks/dockerfile/deno_node_dev:latest"
+      ],
+      "secret": [
+        "type=file,id=certs,src=${CERTS}"
+      ],
+      "args": {
+        "HTTP_PROXY": "${HTTP_PROXY}",
+        "HTTPS_PROXY": "${HTTPS_PROXY}",
+        "NO_PROXY": "${NO_PROXY}",
+        "http_proxy": "${HTTP_PROXY}",
+        "https_proxy": "${HTTPS_PROXY}",
+        "no_proxy": "${NO_PROXY}"
+      }
+    },
+    "dood_local": {
+      "context": "dood_local",
+      "dockerfile": "Dockerfile",
+      "tags": [
+        "github.com/ngicks/dockerfile/dood_local:latest"
+      ],
+      "secret": [
+        "type=file,id=certs,src=${CERTS}"
+      ],
+      "args": {
+        "HTTP_PROXY": "${HTTP_PROXY}",
+        "HTTPS_PROXY": "${HTTPS_PROXY}",
+        "NO_PROXY": "${NO_PROXY}",
+        "http_proxy": "${HTTP_PROXY}",
+        "https_proxy": "${HTTPS_PROXY}",
+        "no_proxy": "${NO_PROXY}"
+      }
+    },
+    "go_dev": {
+      "context": "go_dev",
+      "dockerfile": "Dockerfile",
+      "tags": [
+        "github.com/ngicks/dockerfile/go_dev:latest"
+      ],
+      "secret": [
+        "type=file,id=certs,src=${CERTS}"
+      ],
+      "args": {
+        "HTTP_PROXY": "${HTTP_PROXY}",
+        "HTTPS_PROXY": "${HTTPS_PROXY}",
+        "NO_PROXY": "${NO_PROXY}",
+        "http_proxy": "${HTTP_PROXY}",
+        "https_proxy": "${HTTPS_PROXY}",
+        "no_proxy": "${NO_PROXY}"
+      }
+    },
+    "rust_dev": {
+      "context": "rust_dev",
+      "dockerfile": "Dockerfile",
+      "tags": [
+        "github.com/ngicks/dockerfile/rust_dev:latest"
+      ],
+      "secret": [
+        "type=file,id=certs,src=${CERTS}"
+      ],
+      "args": {
+        "HTTP_PROXY": "${HTTP_PROXY}",
+        "HTTPS_PROXY": "${HTTPS_PROXY}",
+        "NO_PROXY": "${NO_PROXY}",
+        "http_proxy": "${HTTP_PROXY}",
+        "https_proxy": "${HTTPS_PROXY}",
+        "no_proxy": "${NO_PROXY}"
+      }
+    }
+  }
+}

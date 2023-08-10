@@ -1,8 +1,7 @@
-ARG UBUNTU_TAG=jammy-20221101
-ARG RUST_VERSION=1.65.0
-ARG DENO_VERSION=1.28.3
-
-FROM krallin/ubuntu-tini:trusty AS tini_bin
+# syntax = docker/dockerfile:1.4
+ARG UBUNTU_TAG=jammy-20230624
+ARG RUST_VERSION=1.71.1
+ARG DENO_VERSION=1.36.0
 FROM rust:${RUST_VERSION}-slim-buster AS rust_bin
 FROM denoland/deno:bin-${DENO_VERSION} AS deno_bin
 
@@ -14,17 +13,25 @@ ARG LIBS_DEP="autoconf automake bzip2 dpkg-dev file g++ gcc imagemagick libbz2-d
     libncurses5-dev libncursesw5-dev libpng-dev libpq-dev libreadline-dev libsqlite3-dev libssl-dev\
     libtool libwebp-dev libxml2-dev libxslt-dev libyaml-dev make patch unzip xz-utils zlib1g-dev\
     libmysqlclient-dev"
-RUN apt-get update && apt-get install -y ${LIBS_DEP}
+RUN --mount=type=secret,id=certs,target=/etc/ssl/certs/ca-certificates.crt \
+    --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    rm -f /etc/apt/apt.conf.d/docker-clean \
+    ; echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' > /etc/apt/apt.conf.d/keep-cache &&\
+    apt-get update && apt-get install --no-install-recommends -y ${LIBS_DEP}
 
-ARG NETBASE="ca-certificates curl netbase wget"
+ARG NETBASE="curl netbase wget"
 ARG DEV_DEP="git less"
 ARG BINDGEN_DEP="llvm-dev libclang-dev clang"
-RUN apt-get update && apt-get install -y\
+RUN --mount=type=secret,id=certs,target=/etc/ssl/certs/ca-certificates.crt \
+    --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    rm -f /etc/apt/apt.conf.d/docker-clean \
+    ; echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' > /etc/apt/apt.conf.d/keep-cache &&\
+    apt-get update && apt-get install --no-install-recommends -y\
     ${NETBASE}\
     ${DEV_DEP}\
     ${BINDGEN_DEP}
-
-COPY --from=tini_bin /usr/bin/tini /usr/bin/tini
 
 # rust
 COPY --from=rust_bin /usr/local/cargo /usr/local/cargo
@@ -38,6 +45,7 @@ ENV RUSTUP_HOME=/usr/local/rustup\
 VOLUME [ "/usr/local/cargo", "/usr/local/rustup" ]
 
 # Deno
+ENV DENO_CERT=/etc/ssl/certs/ca-certificates.crt
 COPY --from=deno_bin /deno /usr/bin/deno
 # see https://deno.land/manual/getting_started/setup_your_environment#environment-variables
 ENV DENO_DIR=/deno/cache\
@@ -45,4 +53,4 @@ ENV DENO_DIR=/deno/cache\
     PATH=/deno/bin:$PATH
 VOLUME [ "/deno" ]
 
-ENTRYPOINT [ "/usr/bin/tini", "--", "/bin/bash" ]
+ENTRYPOINT [ "/bin/bash" ]
