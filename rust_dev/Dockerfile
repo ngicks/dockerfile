@@ -34,12 +34,15 @@ RUN --mount=type=secret,id=certs,target=/etc/ssl/certs/ca-certificates.crt \
     ${BINDGEN_DEP}
 
 # rust
-COPY --from=rust_bin /usr/local/cargo /usr/local/cargo
-COPY --from=rust_bin /usr/local/rustup /usr/local/rustup
+## We need to avoid COPYing some data to dir since it prevents cargo update.
+## below VOLUME instruction overwrites contents of ./cargo and ./rustup on everytime the container launch.
+COPY --from=rust_bin /usr/local/cargo /usr/local/cargo_initial
+COPY --from=rust_bin /usr/local/rustup/toolchains /usr/local/rustup/toolchains
+COPY --from=rust_bin /usr/local/rustup/update-hashes /usr/local/rustup/update-hashes
 
 ENV RUSTUP_HOME=/usr/local/rustup\
     CARGO_HOME=/usr/local/cargo\
-    PATH=/usr/local/cargo/bin:$PATH\
+    PATH=/usr/local/cargo/bin:/usr/local/cargo_initial/bin:$PATH\
     RUST_VERSION=${RUST_VERSION}
 
 VOLUME [ "/usr/local/cargo", "/usr/local/rustup" ]
