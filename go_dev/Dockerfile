@@ -2,7 +2,7 @@
 ARG UBUNTU_TAG=jammy-20230624
 ARG GO_VERSION=1.21.0
 ARG DENO_VERSION=1.36.0
-FROM golang:${GO_VERSION}-bullseye AS go_bin
+FROM golang:${GO_VERSION}-bookworm AS go_bin
 FROM denoland/deno:bin-${DENO_VERSION} AS deno_bin
 
 FROM ubuntu:${UBUNTU_TAG}

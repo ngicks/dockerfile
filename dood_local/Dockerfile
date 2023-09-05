@@ -3,8 +3,8 @@ ARG UBUNTU_TAG=jammy-20230624
 ARG GO_VERSION=1.21.0
 ARG NODE_VERSION=20.5.0
 ARG DENO_VERSION=1.36.0
-FROM golang:${GO_VERSION}-bullseye AS go_bin
-FROM node:${NODE_VERSION}-bullseye AS node_bin
+FROM golang:${GO_VERSION}-bookworm AS go_bin
+FROM node:${NODE_VERSION}-bookworm AS node_bin
 FROM denoland/deno:bin-${DENO_VERSION} AS deno_bin
 FROM docker:24.0.5 AS docker_bin
 FROM docker/compose-bin:v2.20.2 AS docker_compose_bin

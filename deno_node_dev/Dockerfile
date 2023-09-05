@@ -2,7 +2,7 @@
 ARG UBUNTU_TAG=jammy-20230624
 ARG NODE_VERSION=20.5.0
 ARG DENO_VERSION=1.36.0
-FROM node:${NODE_VERSION}-bullseye AS node_bin
+FROM node:${NODE_VERSION}-bookworm AS node_bin
 FROM denoland/deno:bin-${DENO_VERSION} AS deno_bin
 
 FROM ubuntu:${UBUNTU_TAG}

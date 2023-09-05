@@ -29,11 +29,11 @@ FROM rust:${RUST_VERSION}-slim-buster AS rust_bin
 {{- end}}
 
 {{- if .UseGo}}
-FROM golang:${GO_VERSION}-bullseye AS go_bin
+FROM golang:${GO_VERSION}-bookworm AS go_bin
 {{- end}}
 
 {{- if .UseNode}}
-FROM node:${NODE_VERSION}-bullseye AS node_bin
+FROM node:${NODE_VERSION}-bookworm AS node_bin
 {{- end}}
 
 {{- if .UseDeno}}
