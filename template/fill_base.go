@@ -28,6 +28,8 @@ type optInner struct {
 	NodeVersion     string
 	UseDeno         bool
 	DenoVersion     string
+	UsePython       bool
+	PythonVersion   string
 	Dood            bool
 	EntryPoint      string
 }
@@ -44,6 +46,8 @@ type Option struct {
 	NodeVersion     *string
 	UseDeno         *bool
 	DenoVersion     *string
+	UsePython       *bool
+	PythonVersion   *string
 	Dood            *bool
 	EntryPoint      *string
 }
@@ -84,6 +88,12 @@ func (o Option) intoInner() optInner {
 	if o.DenoVersion != nil {
 		inner.DenoVersion = *o.DenoVersion
 	}
+	if o.UsePython != nil {
+		inner.UsePython = *o.UsePython
+	}
+	if o.PythonVersion != nil {
+		inner.PythonVersion = *o.PythonVersion
+	}
 	if o.Dood != nil {
 		inner.Dood = *o.Dood
 	}
@@ -98,29 +108,33 @@ func (o Option) intoInner() optInner {
 var baseTemplate string
 
 var defaultInner optInner = optInner{
-	UbuntuTag:   "jammy-20230624",
-	UseRust:     false,
-	RustVersion: "1.71.1",
-	UseGo:       false,
-	GoVersion:   "1.21.0",
-	UseNode:     false,
-	NodeVersion: "20.5.0",
-	UseDeno:     false,
-	DenoVersion: "1.36.0",
-	Dood:        false,
+	UbuntuTag:     "jammy-20230624",
+	UseRust:       false,
+	RustVersion:   "1.71.1",
+	UseGo:         false,
+	GoVersion:     "1.21.0",
+	UseNode:       false,
+	NodeVersion:   "20.5.0",
+	UseDeno:       false,
+	DenoVersion:   "1.36.0",
+	UsePython:     false,
+	PythonVersion: "3.11.5",
+	Dood:          false,
 }
 
 var defaultOption Option = Option{
-	UbuntuTag:   &defaultInner.UbuntuTag,
-	UseRust:     &defaultInner.UseRust,
-	RustVersion: &defaultInner.RustVersion,
-	UseGo:       &defaultInner.UseGo,
-	GoVersion:   &defaultInner.GoVersion,
-	UseNode:     &defaultInner.UseNode,
-	NodeVersion: &defaultInner.NodeVersion,
-	UseDeno:     &defaultInner.UseDeno,
-	DenoVersion: &defaultInner.DenoVersion,
-	Dood:        &defaultInner.Dood,
+	UbuntuTag:     &defaultInner.UbuntuTag,
+	UseRust:       &defaultInner.UseRust,
+	RustVersion:   &defaultInner.RustVersion,
+	UseGo:         &defaultInner.UseGo,
+	GoVersion:     &defaultInner.GoVersion,
+	UseNode:       &defaultInner.UseNode,
+	NodeVersion:   &defaultInner.NodeVersion,
+	UseDeno:       &defaultInner.UseDeno,
+	DenoVersion:   &defaultInner.DenoVersion,
+	UsePython:     &defaultInner.UsePython,
+	PythonVersion: &defaultInner.PythonVersion,
+	Dood:          &defaultInner.Dood,
 }
 
 func main() {

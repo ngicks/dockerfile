@@ -5,7 +5,8 @@
         "rust_dev",
         "deno_node_dev",
         "dood_local",
-        "go_dev"
+        "go_dev",
+        "python_dev"
       ]
     }
   },
@@ -83,6 +84,24 @@
       "dockerfile": "Dockerfile",
       "tags": [
         "github.com/ngicks/dockerfile/rust_dev:latest"
+      ],
+      "secret": [
+        "type=file,id=certs,src=${CERTS}"
+      ],
+      "args": {
+        "HTTP_PROXY": "${HTTP_PROXY}",
+        "HTTPS_PROXY": "${HTTPS_PROXY}",
+        "NO_PROXY": "${NO_PROXY}",
+        "http_proxy": "${HTTP_PROXY}",
+        "https_proxy": "${HTTPS_PROXY}",
+        "no_proxy": "${NO_PROXY}"
+      }
+    },
+    "python_dev": {
+      "context": "python_dev",
+      "dockerfile": "Dockerfile",
+      "tags": [
+        "github.com/ngicks/dockerfile/python_dev:latest"
       ],
       "secret": [
         "type=file,id=certs,src=${CERTS}"

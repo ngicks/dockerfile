@@ -1,64 +1,11 @@
 # syntax = docker/dockerfile:1.4
-
-{{- if not .ParentImageName }}
-ARG UBUNTU_TAG={{- if not .UbuntuTag}}jammy-20220801{{- else}}{{- .UbuntuTag}}{{- end}}
-{{- end}}
-
-{{- if .UseRust}}
-ARG RUST_VERSION={{.RustVersion}}
-{{- end}}
-
-{{- if .UseGo}}
-ARG GO_VERSION={{.GoVersion}}
-{{- end}}
-
-{{- if .UseNode}}
-ARG NODE_VERSION={{.NodeVersion}}
-{{- end}}
-
-{{- if .UseDeno}}
-ARG DENO_VERSION={{.DenoVersion}}
-{{- end}}
-
-{{- if .UsePython}}
-ARG PYTHON_VERSION={{.PythonVersion}}
-{{- end}}
-
-{{- if .UseRust}}
-FROM rust:${RUST_VERSION}-slim-buster AS rust_bin
-{{- end}}
-
-{{- if .UseGo}}
-FROM golang:${GO_VERSION}-bullseye AS go_bin
-{{- end}}
-
-{{- if .UseNode}}
-FROM node:${NODE_VERSION}-bullseye AS node_bin
-{{- end}}
-
-{{- if .UseDeno}}
+ARG UBUNTU_TAG=jammy-20230624
+ARG DENO_VERSION=1.36.0
+ARG PYTHON_VERSION=3.11.5
 FROM denoland/deno:bin-${DENO_VERSION} AS deno_bin
-{{- end}}
-
-{{- if .UsePython}}
 FROM python:${PYTHON_VERSION}-slim-bookworm as python_bin
-{{- end}}
-
-{{- if .Dood}}
-FROM docker:24.0.5 AS docker_bin
-FROM docker/compose-bin:v2.20.2 AS docker_compose_bin
-FROM docker/buildx-bin:0.11.2 AS docker_buildx_bin
-{{- end}}
-
-{{- if not .ParentImageName}}
 
 FROM ubuntu:${UBUNTU_TAG}
-{{- else}}
-
-FROM {{.ParentImageName}}:{{.ParentImageTag}}
-{{- end}}
-
-{{- if or .UseNode .UseRust .UsePython}}
 
 ARG LIBS_DEP="autoconf automake bzip2 dpkg-dev file g++ gcc imagemagick libbz2-dev libc6-dev\
     libcurl4-openssl-dev libdb-dev libevent-dev libffi-dev libgdbm-dev libglib2.0-dev libgmp-dev\
@@ -72,21 +19,12 @@ RUN --mount=type=secret,id=certs,target=/etc/ssl/certs/ca-certificates.crt \
     rm -f /etc/apt/apt.conf.d/docker-clean \
     ; echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' > /etc/apt/apt.conf.d/keep-cache &&\
     apt-get update && apt-get install --no-install-recommends -y ${LIBS_DEP}
-{{- end}}
 
 ARG NETBASE="curl netbase wget"
 ARG DEV_DEP="git less"
-{{- if .UseRust}}
-ARG BINDGEN_DEP="llvm-dev libclang-dev clang"
-{{- end}}
-{{- if .UseGo}}
-ARG GO_DEP="g++ gcc libc6-dev make pkg-config"
-{{- end}}
-{{- if .UsePython}}
 ENV TZ=Asia/Tokyo
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 ARG PYTHON_DEPS="gnupg libbluetooth-dev libexpat1-dev tk-dev uuid-dev"
-{{- end}}
 RUN --mount=type=secret,id=certs,target=/etc/ssl/certs/ca-certificates.crt \
     --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
@@ -94,67 +32,8 @@ RUN --mount=type=secret,id=certs,target=/etc/ssl/certs/ca-certificates.crt \
     ; echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' > /etc/apt/apt.conf.d/keep-cache &&\
     apt-get update && apt-get install --no-install-recommends -y\
     ${NETBASE}\
-    ${DEV_DEP}{{- if .UseRust}}\
-    ${BINDGEN_DEP}
-{{- end}}{{- if .UseGo}}\
-    ${GO_DEP}
-{{- end}}{{- if .UsePython}}\
+    ${DEV_DEP}\
     ${PYTHON_DEPS}
-{{- end}}
-
-
-{{- if .Dood}}
-
-# docker cli
-COPY --from=docker_bin /usr/local/bin/docker /usr/local/bin/docker
-COPY --from=docker_compose_bin /docker-compose /usr/libexec/docker/cli-plugins/docker-compose
-COPY --from=docker_buildx_bin /buildx /usr/libexec/docker/cli-plugins/docker-buildx
-{{- end}}
-
-{{- if .UseRust}}
-
-# rust
-## We need to avoid COPYing some data to dir since it prevents cargo update.
-## below VOLUME instruction overwrites contents of ./cargo and ./rustup on everytime the container launch.
-COPY --from=rust_bin /usr/local/cargo /usr/local/cargo_initial
-COPY --from=rust_bin /usr/local/rustup/toolchains /usr/local/rustup/toolchains
-COPY --from=rust_bin /usr/local/rustup/update-hashes /usr/local/rustup/update-hashes
-
-ENV RUSTUP_HOME=/usr/local/rustup\
-    CARGO_HOME=/usr/local/cargo\
-    PATH=/usr/local/cargo/bin:/usr/local/cargo_initial/bin:$PATH\
-    RUST_VERSION=${RUST_VERSION}
-
-VOLUME [ "/usr/local/cargo", "/usr/local/rustup" ]
-{{- end}}
-
-{{- if .UseGo}}
-
-# Go
-COPY --from=go_bin /usr/local/go /usr/local/go
-ENV GOPATH=/go\
-    PATH=/go/bin:/usr/local/go/bin:$PATH
-RUN mkdir -p "$GOPATH/src" "$GOPATH/bin" && chmod -R 777 "$GOPATH"    
-VOLUME [ "/go" ]
-{{- end}}
-
-{{- if .UseNode}}
-
-# Node.js
-COPY --from=node_bin /usr/local/include /usr/local/include
-COPY --from=node_bin /usr/local/lib/node_modules /usr/local/lib/node_modules
-COPY --from=node_bin /usr/local/share/man /usr/local/share/man
-COPY --from=node_bin /usr/local/share/doc /usr/local/share/doc
-
-COPY --from=node_bin /usr/local/bin/node /usr/local/bin/node
-RUN ln -s /usr/local/lib/node_modules/corepack/dist/corepack.js /usr/local/bin/corepack &&\
-    ln -s /usr/local/bin/node /usr/local/bin/nodejs &&\
-    ln -s /usr/local/lib/node_modules/npm/bin/npm-cli.js /usr/local/bin/npm &&\
-    ln -s /usr/local/lib/node_modules/npm/bin/npx-cli.js /usr/local/bin/npx 
-VOLUME [ "/root/.npm" ]
-{{- end}}
-
-{{- if .UseDeno}}
 
 # Deno
 ENV DENO_CERT=/etc/ssl/certs/ca-certificates.crt
@@ -164,9 +43,6 @@ ENV DENO_DIR=/deno/cache\
     DENO_INSTALL_ROOT=/deno\
     PATH=/deno/bin:$PATH
 VOLUME [ "/deno" ]
-{{- end}}
-
-{{- if .UsePython}}
 # python
 COPY --from=python_bin  /usr/local/bin/2to3-3.11 \ 
                         /usr/local/bin/idle3.11 \ 
@@ -197,12 +73,5 @@ ENV PYTHON_VERSION=3.11.5\
     PYTHON_PIP_VERSION=23.2.1\
     PYTHON_GET_PIP_SHA256=45a2bb8bf2bb5eff16fdd00faef6f29731831c7c59bd9fc2bf1f3bed511ff1fe\
     PYTHON_GET_PIP_URL=https://github.com/pypa/get-pip/raw/9af82b715db434abb94a0a6f3569f43e72157346/public/get-pip.py
-{{- end}}
-
-{{- if .EntryPoint}}
-
-ENTRYPOINT {{.EntryPoint}}
-{{else}}
 
 ENTRYPOINT [ "/bin/bash" ]
-{{end}}
