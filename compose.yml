@@ -16,6 +16,10 @@ services:
         source: ${CERT_DIR:-/etc/ssl/certs/}
         target: /etc/ssl/certs/
         read_only: true
+      - type: bind
+        source: ${GIT_CONFIG:-$HOME/.gitconfig}
+        target: /root/.gitconfig_host
+        read_only: true
       - type: volume
         source: deno
         target: /deno
@@ -58,7 +62,17 @@ services:
       - type: volume
         source: rustup
         target: /usr/local/rustup
-
+  python_dev:
+    image: github.com/ngicks/dockerfile/python_dev:latest
+    init: true
+    tty: true
+    env_file: ${ENVFILE:-default.env}
+    volumes_from:
+      - deno_node_dev
+    volumes:
+      - type: volume
+        source: pipcache
+        target: /root/.cache/pip
 volumes:
   git:
     external: true
@@ -73,4 +87,6 @@ volumes:
   cargo:
     external: true
   rustup:
+    external: true
+  pipcache:
     external: true
