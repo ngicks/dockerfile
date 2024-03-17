@@ -8,7 +8,7 @@ FROM denoland/deno:bin-${DENO_VERSION} AS deno_bin
 FROM ubuntu:${UBUNTU_TAG}
 
 ARG NETBASE="curl netbase wget"
-ARG DEV_DEP="git less"
+ARG DEV_DEP="git less gpg"
 ARG GO_DEP="g++ gcc libc6-dev make pkg-config"
 RUN --mount=type=secret,id=certs,target=/etc/ssl/certs/ca-certificates.crt \
     --mount=type=cache,target=/var/cache/apt,sharing=locked \

@@ -81,7 +81,7 @@ RUN --mount=type=secret,id=certs,target=/etc/ssl/certs/ca-certificates.crt \
 {{- end}}
 
 ARG NETBASE="curl netbase wget"
-ARG DEV_DEP="git less"
+ARG DEV_DEP="git less gpg"
 {{- if .UseRust}}
 ARG BINDGEN_DEP="llvm-dev libclang-dev clang"
 {{- end}}

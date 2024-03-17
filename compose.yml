@@ -17,8 +17,8 @@ services:
         target: /etc/ssl/certs/
         read_only: true
       - type: bind
-        source: ${GIT_CONFIG:-$HOME/.gitconfig}
-        target: /root/.gitconfig_host
+        source: ~/.gnupg/
+        target: /root/.gnupg/
         read_only: true
       - type: volume
         source: deno

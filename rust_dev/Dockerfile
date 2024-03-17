@@ -27,7 +27,7 @@ RUN --mount=type=secret,id=certs,target=/etc/ssl/certs/ca-certificates.crt \
     apt-get update && apt-get install --no-install-recommends -y ${LIBS_DEP}
 
 ARG NETBASE="curl netbase wget"
-ARG DEV_DEP="git less"
+ARG DEV_DEP="git less gpg"
 ARG BINDGEN_DEP="llvm-dev libclang-dev clang"
 RUN --mount=type=secret,id=certs,target=/etc/ssl/certs/ca-certificates.crt \
     --mount=type=cache,target=/var/cache/apt,sharing=locked \

@@ -27,7 +27,7 @@ RUN --mount=type=secret,id=certs,target=/etc/ssl/certs/ca-certificates.crt \
     apt-get update && apt-get install --no-install-recommends -y ${LIBS_DEP}
 
 ARG NETBASE="curl netbase wget"
-ARG DEV_DEP="git less"
+ARG DEV_DEP="git less gpg"
 ENV TZ=Asia/Tokyo
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 ARG PYTHON_DEPS="gnupg libbluetooth-dev libexpat1-dev tk-dev uuid-dev"
