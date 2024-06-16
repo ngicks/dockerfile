@@ -1,24 +1,18 @@
 name: devcontainers
 services:
-  deno_node_dev:
+  volumes:
     image: github.com/ngicks/dockerfile/deno_node_dev:latest
-    init: true
-    tty: true
-    env_file: ${ENVFILE:-default.env}
     volumes:
       - type: volume
         source: git
         target: /git
-      - type: volume
-        source: vscode-server
-        target: /root/.vscode-server
       - type: bind
         source: ${CERT_DIR:-/etc/ssl/certs/}
         target: /etc/ssl/certs/
         read_only: true
       - type: bind
-        source: ~/.gnupg/
-        target: /root/.gnupg/
+        source: ${GIT_CONFIG:-$HOME/.gitconfig}
+        target: /root/.gitconfig_host
         read_only: true
       - type: volume
         source: deno
@@ -26,14 +20,32 @@ services:
       - type: volume
         source: npm
         target: /root/.npm
+      - type: bind
+        source: ~/.gnupg/pubring.kbx
+        target: /root/.gnupg/pubring.kbx
+        read_only: true
+  deno_node_dev:
+    image: github.com/ngicks/dockerfile/deno_node_dev:latest
+    init: true
+    tty: true
+    env_file: ${ENVFILE:-default.env}
+    volumes_from:
+      - volumes
+    volumes:
+      - type: volume
+        source: vscode-server-deno-node
+        target: /root/.vscode-server
   dood_local:
     image: github.com/ngicks/dockerfile/dood_local:latest
     init: true
     tty: true
     env_file: ${ENVFILE:-default.env}
     volumes_from:
-      - deno_node_dev
+      - volumes
     volumes:
+      - type: volume
+        source: vscode-server-dood-local
+        target: /root/.vscode-server
       - type: bind
         source: ${DOCKR_HOST:-/var/run/docker.sock}
         target: /var/run/docker.sock
@@ -43,8 +55,11 @@ services:
     tty: true
     env_file: ${ENVFILE:-default.env}
     volumes_from:
-      - deno_node_dev
+      - volumes
     volumes:
+      - type: volume
+        source: vscode-server-go
+        target: /root/.vscode-server
       - type: volume
         source: go
         target: /go
@@ -54,8 +69,11 @@ services:
     tty: true
     env_file: ${ENVFILE:-default.env}
     volumes_from:
-      - deno_node_dev
+      - volumes
     volumes:
+      - type: volume
+        source: vscode-server-rust
+        target: /root/.vscode-server
       - type: volume
         source: cargo
         target: /usr/local/cargo
@@ -68,15 +86,26 @@ services:
     tty: true
     env_file: ${ENVFILE:-default.env}
     volumes_from:
-      - deno_node_dev
+      - volumes
     volumes:
+      - type: volume
+        source: vscode-server-python
+        target: /root/.vscode-server
       - type: volume
         source: pipcache
         target: /root/.cache/pip
 volumes:
   git:
     external: true
-  vscode-server:
+  vscode-server-deno-node:
+    external: true
+  vscode-server-dood-local:
+    external: true
+  vscode-server-go:
+    external: true
+  vscode-server-python:
+    external: true
+  vscode-server-rust:
     external: true
   deno:
     external: true
