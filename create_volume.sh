@@ -9,3 +9,4 @@ docker volume create npm
 docker volume create go
 docker volume create cargo
 docker volume create rustup
+docker volume create pipcache
