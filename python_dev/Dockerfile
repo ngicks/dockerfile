@@ -51,18 +51,18 @@ ENV DENO_DIR=/deno/cache\
 VOLUME [ "/deno" ]
 # python
 COPY --from=python_bin  /usr/local/bin/2to3-3.11 \ 
-    /usr/local/bin/idle3.11 \ 
-    /usr/local/bin/pip \ 
-    /usr/local/bin/pip3 \ 
-    /usr/local/bin/pip3.11 \ 
-    /usr/local/bin/pydoc3.11 \ 
-    /usr/local/bin/python3.11 \ 
-    /usr/local/bin/python3.11-config \ 
-    /usr/local/bin/wheel \ 
-    /usr/local/bin/
+                        /usr/local/bin/idle3.11 \ 
+                        /usr/local/bin/pip \ 
+                        /usr/local/bin/pip3 \ 
+                        /usr/local/bin/pip3.11 \ 
+                        /usr/local/bin/pydoc3.11 \ 
+                        /usr/local/bin/python3.11 \ 
+                        /usr/local/bin/python3.11-config \ 
+                        /usr/local/bin/wheel \ 
+                        /usr/local/bin/
 COPY --from=python_bin  /usr/local/lib/libpython3.11.so.1.0\
-    /usr/local/lib/libpython3.so\
-    /usr/local/lib/
+                        /usr/local/lib/libpython3.so\
+                        /usr/local/lib/
 RUN ln -s 2to3-3.11 /usr/local/bin/2to3 && \
     ln -s idle3  /usr/local/bin/idle && \
     ln -s idle3.11  /usr/local/bin/idle3 && \
