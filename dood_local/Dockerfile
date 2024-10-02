@@ -1,8 +1,8 @@
 # syntax = docker/dockerfile:1.4
-ARG UBUNTU_TAG=jammy-20230624
-ARG GO_VERSION=1.23.0
-ARG NODE_VERSION=20.5.0
-ARG DENO_VERSION=1.36.0
+ARG UBUNTU_TAG=jammy-20240911.1
+ARG GO_VERSION=1.23.2
+ARG NODE_VERSION=22.9.0
+ARG DENO_VERSION=1.46.3
 FROM golang:${GO_VERSION}-bookworm AS go_bin
 FROM node:${NODE_VERSION}-bookworm AS node_bin
 FROM denoland/deno:bin-${DENO_VERSION} AS deno_bin

@@ -108,17 +108,17 @@ func (o Option) intoInner() optInner {
 var baseTemplate string
 
 var defaultInner optInner = optInner{
-	UbuntuTag:     "jammy-20230624",
+	UbuntuTag:     "jammy-20240911.1",
 	UseRust:       false,
-	RustVersion:   "1.71.1",
+	RustVersion:   "1.81.0",
 	UseGo:         false,
-	GoVersion:     "1.23.0",
+	GoVersion:     "1.23.2",
 	UseNode:       false,
-	NodeVersion:   "20.5.0",
+	NodeVersion:   "22.9.0",
 	UseDeno:       false,
-	DenoVersion:   "1.36.0",
+	DenoVersion:   "1.46.3",
 	UsePython:     false,
-	PythonVersion: "3.11.5",
+	PythonVersion: "3.12.7",
 	Dood:          false,
 }
 

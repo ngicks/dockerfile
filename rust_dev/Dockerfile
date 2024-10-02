@@ -1,8 +1,8 @@
 # syntax = docker/dockerfile:1.4
-ARG UBUNTU_TAG=jammy-20230624
-ARG RUST_VERSION=1.71.1
-ARG DENO_VERSION=1.36.0
-FROM rust:${RUST_VERSION}-slim-buster AS rust_bin
+ARG UBUNTU_TAG=jammy-20240911.1
+ARG RUST_VERSION=1.81.0
+ARG DENO_VERSION=1.46.3
+FROM rust:${RUST_VERSION}-slim-bookworm AS rust_bin
 FROM denoland/deno:bin-${DENO_VERSION} AS deno_bin
 
 FROM ubuntu:${UBUNTU_TAG}
