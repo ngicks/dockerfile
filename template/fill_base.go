@@ -112,7 +112,7 @@ var defaultInner optInner = optInner{
 	UseRust:       false,
 	RustVersion:   "1.81.0",
 	UseGo:         false,
-	GoVersion:     "1.23.2",
+	GoVersion:     "1.24.0",
 	UseNode:       false,
 	NodeVersion:   "22.9.0",
 	UseDeno:       false,
